@@ -7,6 +7,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var taglineLabel: UILabel!
     @IBOutlet weak var firstLabel: UILabel!
     @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var valueLabel: UILabel!
+    @IBOutlet weak var unitLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,8 +33,9 @@ class ViewController: UIViewController {
             case 200:
             print("성공")
             
-                guard let beer: [RandomBeer] = try? JSONDecoder().decode([RandomBeer].self, from: data)
-                else { return }
+                let beer = try? JSONDecoder().decode([RandomBeer].self, from: data)
+                
+                if let beer = beer {
                 let imageURL = URL(string: beer[0].image_url)!
                 let imageData = try? Data(contentsOf: imageURL)
                 DispatchQueue.main.async {
@@ -40,12 +43,18 @@ class ViewController: UIViewController {
                 self.nameLabel.text = beer[0].name
                 self.taglineLabel.text = beer[0].tagline
                 self.firstLabel.text = beer[0].first_brewed
-                
+                self.valueLabel.text = String(beer[0].volume.value)
+                self.unitLabel.text = beer[0].volume.unit
+                    
                 if let data = imageData {
                 self.imageView.image = UIImage(data: data)
                     }
                 }
-    
+                    
+                } else {
+                print("파싱 실패")
+                }
+                
             default:
                 print("실패, \(error?.localizedDescription)")
             }
